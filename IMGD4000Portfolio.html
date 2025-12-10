@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>IMGD 4000 – Development Portfolio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      background-color: #5F5E61;
+      color: #222;
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 24px 28px;
+      background-color: #ffffff;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      border-radius: 10px;
+    }
+    h1, h2, h3 {
+      font-weight: 600;
+      color: #111;
+    }
+    h1 {
+      font-size: 1.9rem;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    h2 {
+      margin-top: 1.8rem;
+      font-size: 1.4rem;
+    }
+    h3 {
+      margin-top: 1.2rem;
+      font-size: 1.1rem;
+    }
+    p {
+      margin: 0.4rem 0 0.9rem;
+    }
+    ul {
+      padding-left: 1.4rem;
+    }
+    code {
+      font-family: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background: #f2f2f2;
+      padding: 0.1rem 0.25rem;
+      border-radius: 4px;
+      font-size: 0.95em;
+    }
+    .section-note {
+      font-size: 0.9rem;
+      color: #555;
+      border-left: 3px solid #ddd;
+      padding-left: 0.75rem;
+      margin: 0.5rem 0 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Development Portfolio — IMGD 4000</h1>
+
+    <h2>Role in the Project</h2>
+    <p>
+      During the Alpha milestone, my primary responsibility was implementing the player movement system.
+      For the Beta milestone, I shifted towards interaction and puzzle logic, specifically developing
+      the note-pickup mechanic and the portrait bookshelf hint system.
+    </p>
+
+    <h2>Challenges and Problem-Solving</h2>
+
+    <h3>1. Alpha Movement Integration Failure</h3>
+    <img src="./Images/BP_PlayerController.png" height="600"/>
+    <p>
+      Initially, I designed the movement system and animations for a freely rotating camera. The player could only move
+      forward relative to camera direction, so when our team integrated assets, the character was stuck
+      facing forward, unable to turn horizontally. Naturally, the rotate-left/right functionality I had
+      implemented became useless in the integrated project.
+    </p>
+    <img src="./Gifs/Jog_fwd.gif" height="200"/>
+    <img src="./Gifs/Jog_bwd.gif" height="200"/>
+    <img src="./Gifs/Jog_right.gif" height="200"/>
+    <img src="./Gifs/Jog_left.gif" height="200"/>
+    <img src="./Gifs/Turn_left.gif" height="200"/>
+    <img src="./Gifs/Turn_right.gif" height="200"/>
+    <img src="./Gifs/Jump.gif" height="200"/>
+    <p>
+      To synchronize with the project’s fixed camera design, I removed my rotation system entirely.
+      I modified input handling so directional keys directly changed the player’s facing direction
+      instead of rotating a camera around them. The Alpha character model was Unreal Engine’s default
+      mannequin, but later another teammate replaced it with the finalized model and animation set.
+    </p>
+
+    <h3>2. Beta Note Interaction Mechanic</h3>
+    <p>
+      Implementing the note system was relatively straightforward. When the player overlapped a note’s
+      collision box and pressed <code>E</code>, I triggered a Custom Event in <code>BP_Note</code>.
+      That event spawned and displayed a UI widget (<code>BP_NoteWidget</code>) on screen. Pressing
+      <code>E</code> again removed the widget.
+    </p>
+    <img src="./Images/BP_Player_NoteInteraction.png" height="300"/>
+    <p>
+      This toggle behavior was handled using <code>FlipFlop</code> nodes in Blueprints. The widget Blueprint
+      contained simple animations for when the note appears and disappears, helping the interaction feel
+      more polished and readable to the player.
+    </p>
+    <img src="./Images/BP_Note.png" height="300"/>
+    <img src="./Images/BP_NoteWidget_Animation.png" height="200"/>
+    <img src="./Gifs/NotePickup.gif" height="300"/>
+
+    <h3>3. Camera Switching for Puzzle Hint</h3>
+    <p>
+      The most difficult task during Beta was handling the camera transition toward a hallway portrait and
+      then returning to normal gameplay. I created a dedicated camera component inside
+      <code>BP_Portrait</code> so the portrait could be viewed from a separate cinematic angle. Using
+      camera blending, switching to this camera was straightforward but returning was not.
+    </p>
+    <img src="./Images/BP_Player_Portraitinteraction.png" height="250"/>
+    <img src="./Images/BP_Portrait.png" height="300"/>
+    <p>
+      When blending back, the camera consistently snapped behind the player’s feet instead of returning
+      to the hallway camera. After unsuccessful debugging attempts, I discovered that our camera programmer
+      had already built a Custom Event specifically for restoring the hallway view. However, calling it
+      still produced errors.
+    </p>
+    <p>
+      A teammate suggested re-examining variable assignments. Following that hint, I realized that in the
+      details panel, the variable intended to reference the hallway camera was never manually assigned.
+      After correcting this reference binding, the issue was fully resolved.
+    </p>
+    <img src="./Images/BP_Portrait_DefaultCamDetail.png" height="300"/>
+    <img src="./Images/BP_Portriat_DefaultCam.png" height="50"/>
+    <p>
+      This experience reinforced a critical lesson, that not every problem should be solved alone. Asking for
+      help revealed overlooked assumptions much faster than trial-and-error debugging.
+    </p>
+    <img src="./Gifs/PortraitCloseup.gif" height="300"/>
+
+    <h2>Technical Elements Used</h2>
+    <ul>
+      <li>Blueprint scripting for interaction logic</li>
+      <li>Overlap detection and input conditionals (<code>E</code> key interaction)</li>
+      <li><code>FlipFlop</code> toggling logic for UI visibility</li>
+      <li>UI Widget animation for note appearance/disappearance</li>
+      <li>Camera components and camera blending between gameplay and portrait views</li>
+      <li>Custom Events for system-level camera switching and restoration</li>
+    </ul>
+
+    <h2>Lessons Learned</h2>
+    <h3>1. Design Alignment Matters</h3>
+    <p>
+      My Alpha movement system failed because it ignored team-wide camera design assumptions.
+      Collaborative projects require alignment early; otherwise, extra work and refactoring
+      become inevitable later in the pipeline.
+    </p>
+
+    <h3>2. Communication Accelerates Debugging</h3>
+    <p>
+      The camera bug took far too long to solve because I initially isolated myself while debugging.
+      Directly asking teammates revealed the missing variable reference and solved the problem quickly.
+      Open communication is often more effective than silently struggling.
+    </p>
+
+    <h3>3. Reference Binding Is Critical in Unreal Engine</h3>
+    <p>
+      Many Unreal Engine issues arise not from complex logic errors but from unassigned or incorrectly
+      bound object references. This project reminded me to always check variable bindings in the details
+      panel when something “mysterious” happens in-game.
+    </p>
+
+    <h2>Version Control Choice and Experience</h2>
+    <p>
+      We used <strong>Git and GitHub</strong> as our version control tools, mainly due to their familiarity
+      and universal adoption among teammates. They provided a reliable workflow for merging Blueprint assets
+      and handling level/scene file conflicts. Although Blueprint merging required extra caution, it was
+      manageable with communication, clear ownership of assets, and disciplined commit practices.
+    </p>
+  </div>
+</body>
+</html>
+```
